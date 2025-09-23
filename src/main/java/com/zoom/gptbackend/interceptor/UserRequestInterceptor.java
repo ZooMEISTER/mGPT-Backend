@@ -56,6 +56,7 @@ public class UserRequestInterceptor implements HandlerInterceptor {
         if (requestPath.startsWith("/tourist")) { expectPermissionLevel = PermissionLevel.Tourist; }
         else if (requestPath.startsWith("/conversation")) { expectPermissionLevel = PermissionLevel.User; }
         else if (requestPath.startsWith("/chat")) { expectPermissionLevel = PermissionLevel.User; }
+        else if (requestPath.startsWith("/blog")) { expectPermissionLevel = PermissionLevel.Tourist; }
 
         // 看看发送的请求是否需要鉴权
         if(expectPermissionLevel > PermissionLevel.Tourist && request.getHeader("Authorization") != null){

@@ -125,7 +125,7 @@ public class OpenAiJsonFastjsonParser {
                 JSONObject choice = json.getJSONArray("choices").getJSONObject(0);
                 if (choice.containsKey("delta")) {
                     JSONObject delta = choice.getJSONObject("delta");
-                    if (delta != null && delta.containsKey("content")) {
+                    if (delta != null && delta.containsKey("content") && delta.get("content") != null) {
                         cleanText.append(delta.getString("content"));
                     }
                 }

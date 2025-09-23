@@ -48,13 +48,6 @@ public class ChatController {
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> streamChat(@RequestBody ChatRequest chatRequest, HttpServletRequest request) {
         try {
-            // 保存用户发送的信息
-            conversationService.SaveUserMessages(
-                    chatRequest.getConversationId(),
-                    chatRequest.getModel(),
-                    chatRequest.getRawJsonMessages()
-            );
-
             // 解析 rawJsonMessages
             JSONArray messagesArray = JSON.parseArray(chatRequest.getRawJsonMessages());
 
@@ -91,17 +84,26 @@ public class ChatController {
                         aiResponse.updateAndGet(existing -> existing + chunk);
                     })
                     .doOnComplete(() -> {
-                        // 流式完成后，保存完整的AI回复到数据库
+                        // 流式完成后，保存完整的 用户提问 和 AI回复 到数据库
                         String fullRawContent = aiResponse.get();
                         String cleanContent = OpenAiJsonFastjsonParser.extractAiContent(fullRawContent);
                         System.out.println(fullRawContent);
                         System.out.println(cleanContent);
 
+                        // 保存用户发送的信息
+                        conversationService.SaveUserMessages(
+                                chatRequest.getConversationId(),
+                                chatRequest.getModel(),
+                                chatRequest.getRawJsonMessages(),
+                                new Date()
+                        );
+
                         conversationService.SaveAIMessages(
                                 chatRequest.getConversationId(),
                                 chatRequest.getModel(),
                                 fullRawContent,
-                                cleanContent
+                                cleanContent,
+                                new Date()
                         );
                     })
                     .onErrorResume(e -> {

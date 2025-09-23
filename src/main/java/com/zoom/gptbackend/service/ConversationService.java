@@ -26,8 +26,8 @@ public interface ConversationService {
     DataResultVO GetConversationContentByConversationId(String conversationId);
     DataResultVO SendMessage(String conversationId, String model, String rawJsonMessages);
     DataResultVO CreateNewConversation(String userId, String title);
-    DataResultVO SaveUserMessages(String conversationId, String model, String rawJsonMessages);
-    DataResultVO SaveAIMessages(String conversationId, String model, String rawAIContent, String cleanAIContent);
+    DataResultVO SaveUserMessages(String conversationId, String model, String rawJsonMessages, Date createdTime);
+    DataResultVO SaveAIMessages(String conversationId, String model, String rawAIContent, String cleanAIContent, Date createdTime);
     DataResultVO UpdateConversationUpdateTime(String conversationId, Date updateTime);
     DataResultVO DeleteConversation(String conversationId);
 }

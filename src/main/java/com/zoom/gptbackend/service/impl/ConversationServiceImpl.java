@@ -87,7 +87,9 @@ public class ConversationServiceImpl implements ConversationService {
                     "user",
                     rawJsonMessages,
                     JsonArrayHelper.findLastUserRole(JSONArray.parseArray(rawJsonMessages)).getString("content"),
-                    "USER");
+                    "USER",
+                    new Date(),
+                    0);
             // 组装要发送的对象
             Map<String, Object> body = new HashMap<>();
             body.put("model", model);
@@ -106,7 +108,9 @@ public class ConversationServiceImpl implements ConversationService {
                         "assistant",
                         response,
                         content,
-                        model
+                        model,
+                        new Date(),
+                        1
                 );
             }
 
@@ -142,12 +146,12 @@ public class ConversationServiceImpl implements ConversationService {
     /**
      * @Author: ZooMEISTER
      * @Description: 保存用户发给 AI 的对话数据
-     * @DateTime: 2025/4/28 10:29
-     * @Param: [conversationId, model, rawJsonMessages]
+     * @DateTime: 2025/4/30 15:22
+     * @Param: [conversationId, model, rawJsonMessages, createdTime]
      * @Return: com.zoom.gptbackend.pojo.vo.result.DataResultVO
      */
     @Override
-    public DataResultVO SaveUserMessages(String conversationId, String model, String rawJsonMessages) {
+    public DataResultVO SaveUserMessages(String conversationId, String model, String rawJsonMessages, Date createdTime) {
         try{
             // 往数据库中写入用户发送的消息
             int saveRes = conversationMapper.InsertNewChatHistory(
@@ -156,22 +160,26 @@ public class ConversationServiceImpl implements ConversationService {
                     "user",
                     rawJsonMessages,
                     JsonArrayHelper.findLastUserRole(JSONArray.parseArray(rawJsonMessages)).getString("content"),
-                    "USER");
+                    "USER",
+                    createdTime,
+                    0
+            );
             return new DataResultVO(DefaultResultCode.SUCCESS, String.valueOf(saveRes), null);
         } catch (Exception e) {
             return new DataResultVO(DefaultResultCode.ERROR, e.toString(), null);
         }
     }
 
+
     /**
      * @Author: ZooMEISTER
      * @Description: 保存 AI 返回的生成信息
-     * @DateTime: 2025/4/28 10:38
-     * @Param: [conversationId, model, rawAIContent, cleanAIContent]
+     * @DateTime: 2025/4/30 15:22
+     * @Param: [conversationId, model, rawAIContent, cleanAIContent, createdTime]
      * @Return: com.zoom.gptbackend.pojo.vo.result.DataResultVO
      */
     @Override
-    public DataResultVO SaveAIMessages(String conversationId, String model, String rawAIContent, String cleanAIContent){
+    public DataResultVO SaveAIMessages(String conversationId, String model, String rawAIContent, String cleanAIContent, Date createdTime){
         try{
             int saveRes = conversationMapper.InsertNewChatHistory(
                     UUID.randomUUID().toString(),
@@ -179,7 +187,9 @@ public class ConversationServiceImpl implements ConversationService {
                     "assistant",
                     rawAIContent,
                     cleanAIContent,
-                    model
+                    model,
+                    createdTime,
+                    1
             );
             return new DataResultVO(DefaultResultCode.SUCCESS, String.valueOf(saveRes), null);
         } catch (Exception e) {
